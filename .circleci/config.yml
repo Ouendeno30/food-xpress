@@ -1,0 +1,40 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@5.0
+
+jobs:
+  build:
+    executor:
+      name: win/default
+      size: medium
+    steps:
+      - checkout
+      
+      - run:
+          name: "Installer Node.js"
+          command: |
+            choco install nodejs-lts --version=20.19.0 -y
+            refreshenv
+      
+      - run:
+          name: "Vérifier Node.js"
+          command: node --version && npm --version
+      
+      - run:
+          name: "Installer les dépendances"
+          command: npm install
+      
+      - run:
+          name: "Builder FOOD XPRESS"
+          command: npm run build
+      
+      - store_artifacts:
+          path: dist\*.exe
+          destination: food-xpress-setup
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
